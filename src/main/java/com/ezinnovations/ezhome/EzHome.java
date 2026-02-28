@@ -106,6 +106,14 @@ public class EzHome extends JavaPlugin {
         Bukkit.getScheduler().runTask(this, runnable);
     }
 
+    public void scheduleGlobalTask(Runnable runnable) {
+        if (folia) {
+            Bukkit.getGlobalRegionScheduler().execute(this, runnable);
+            return;
+        }
+        Bukkit.getScheduler().runTask(this, runnable);
+    }
+
     public void scheduleRegionTask(Location location, Runnable runnable) {
         if (folia) {
             Bukkit.getRegionScheduler().execute(this, location, runnable);
