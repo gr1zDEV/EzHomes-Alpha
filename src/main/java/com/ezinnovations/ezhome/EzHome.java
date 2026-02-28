@@ -4,6 +4,10 @@ import com.ezinnovations.ezhome.commands.HomeCommand;
 import com.ezinnovations.ezhome.gui.HomeGUI;
 import com.ezinnovations.ezhome.listeners.GUIListener;
 import com.ezinnovations.ezhome.managers.HomeManager;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedPermissionData;
+import net.luckperms.api.context.QueryOptions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -25,11 +29,13 @@ public class EzHome extends JavaPlugin {
     private HomeManager homeManager;
     private HomeGUI homeGUI;
     private boolean folia;
+    private LuckPerms luckPerms;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         folia = detectFolia();
+        luckPerms = resolveLuckPerms();
 
         homeManager = new HomeManager(this);
         homeGUI = new HomeGUI(this);
@@ -76,11 +82,35 @@ public class EzHome extends JavaPlugin {
     public int getAllowedHomes(Player player) {
         int highest = getConfig().getInt("default-home-limit", 1);
         for (int i = 1; i <= 54; i++) {
-            if (player.hasPermission("ezhomes.homes." + i)) {
+            if (hasPermission(player, "ezhome.homes." + i) || hasPermission(player, "ezhomes.homes." + i)) {
                 highest = Math.max(highest, i);
             }
         }
         return Math.max(1, highest);
+    }
+
+    public boolean hasLuckPermsPermission(Player player, String permission) {
+        if (luckPerms == null) {
+            return false;
+        }
+
+        QueryOptions queryOptions = luckPerms.getContextManager().getQueryOptions(player).orElse(null);
+        if (queryOptions == null) {
+            return false;
+        }
+
+        CachedPermissionData permissionData = luckPerms.getPlayerAdapter(Player.class)
+                .getUser(player)
+                .getCachedData()
+                .getPermissionData(queryOptions);
+        return permissionData.checkPermission(permission).asBoolean();
+    }
+
+    public boolean hasPermission(Player player, String permission) {
+        if (luckPerms != null) {
+            return hasLuckPermsPermission(player, permission);
+        }
+        return player.hasPermission(permission);
     }
 
     public Component message(String key, String... placeholders) {
@@ -128,6 +158,17 @@ public class EzHome extends JavaPlugin {
             return true;
         } catch (ClassNotFoundException ignored) {
             return false;
+        }
+    }
+
+    private LuckPerms resolveLuckPerms() {
+        try {
+            LuckPerms api = LuckPermsProvider.get();
+            getLogger().info("Hooked into LuckPerms for permission checks.");
+            return api;
+        } catch (IllegalStateException exception) {
+            getLogger().warning("LuckPerms not found. EzHome permission-based home limits will default to configured fallback.");
+            return null;
         }
     }
 }

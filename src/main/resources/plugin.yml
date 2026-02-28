@@ -6,6 +6,8 @@ folia-supported: true
 description: Simple home management with GUI
 authors:
   - EzInnovations
+softdepend:
+  - LuckPerms
 commands:
   home:
     description: Manage your homes
@@ -15,3 +17,9 @@ permissions:
   ezhome.use:
     description: Allows use of /home command
     default: true
+  ezhome.homes.1:
+    description: Allows 1 home
+    default: true
+  ezhome.homes.54:
+    description: Allows up to 54 homes
+    default: op
