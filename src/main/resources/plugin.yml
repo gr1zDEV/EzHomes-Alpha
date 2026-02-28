@@ -1,0 +1,17 @@
+name: EzHome
+version: '${version}'
+main: com.ezinnovations.ezhome.EzHome
+api-version: '1.21'
+folia-supported: true
+description: Simple home management with GUI
+authors:
+  - EzInnovations
+commands:
+  home:
+    description: Manage your homes
+    usage: /home [create|delete] [name]
+    permission: ezhome.use
+permissions:
+  ezhome.use:
+    description: Allows use of /home command
+    default: true

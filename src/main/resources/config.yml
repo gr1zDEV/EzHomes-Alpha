@@ -1,0 +1,11 @@
+# EzHome Configuration
+gui-title: "&6&lHomes"
+default-home-limit: 1
+team-slots: 2
+messages:
+  home-created: "&aHome &f{name} &acreated!"
+  home-deleted: "&cHome &f{name} &cdeleted."
+  home-limit-reached: "&cYou've reached your home limit! ({max})"
+  home-already-exists: "&cA home named &f{name} &calready exists."
+  home-not-found: "&cHome &f{name} &cnot found."
+  teleporting: "&eTeleporting to &f{name}&e..."
