@@ -16,8 +16,10 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class HomeGUI {
     public static final int SIZE = 54;
@@ -38,6 +40,18 @@ public class HomeGUI {
                 plugin.getConfig().getString("gui-title", "&6&lHomes"));
         Inventory inventory = Bukkit.createInventory(player, resolveGuiSize(), parseLegacy(title));
 
+        List<Integer> teamSlotIndexes = resolveSlots("gui.team-slot-indexes", inventory.getSize());
+        int teamSlots = Math.min(teamSlotIndexes.size(), Math.max(0, plugin.getConfig().getInt("gui.team-slots",
+                plugin.getConfig().getInt("team-slots", 2))));
+        if (teamSlotIndexes.isEmpty()) {
+            teamSlotIndexes = defaultSequentialSlots(teamSlots, inventory.getSize());
+        }
+
+        List<Integer> homeSlotIndexes = resolveSlots("gui.home-slots", inventory.getSize());
+        if (homeSlotIndexes.isEmpty()) {
+            homeSlotIndexes = sequentialHomeSlots(inventory.getSize(), teamSlotIndexes);
+        }
+
         for (Map<?, ?> itemConfig : plugin.getConfig().getMapList("gui.static-items")) {
             int slot = toInt(itemConfig.get("slot"), -1);
             if (slot < 0 || slot >= inventory.getSize()) {
@@ -46,22 +60,18 @@ public class HomeGUI {
             inventory.setItem(slot, buildConfigItem(itemConfig));
         }
 
-        int teamSlots = Math.min(2, plugin.getConfig().getInt("gui.team-slots",
-                plugin.getConfig().getInt("team-slots", 2)));
         for (int i = 0; i < teamSlots; i++) {
-            inventory.setItem(i, configItem("gui.team-item", Material.RED_DYE,
+            inventory.setItem(teamSlotIndexes.get(i), configItem("gui.team-item", Material.RED_DYE,
                     "&c&lTeams", List.of("&7Coming Soon...")));
         }
 
-        int maxHomesByGui = inventory.getSize() - teamSlots;
+        int maxHomesByGui = homeSlotIndexes.size();
         int allowedHomes = Math.min(maxHomesByGui, plugin.getAllowedHomes(player));
         List<Home> homes = new ArrayList<>(plugin.getHomeManager().getHomes(player.getUniqueId()).values());
         homes.sort(Comparator.comparing(Home::name, String.CASE_INSENSITIVE_ORDER));
 
-        int homeStart = teamSlots;
-
-        for (int slot = homeStart; slot < inventory.getSize(); slot++) {
-            int index = slot - homeStart;
+        for (int index = 0; index < homeSlotIndexes.size(); index++) {
+            int slot = homeSlotIndexes.get(index);
             if (index < homes.size()) {
                 Home home = homes.get(index);
                 inventory.setItem(slot, homeItem(home));
@@ -71,12 +81,6 @@ public class HomeGUI {
             } else {
                 inventory.setItem(slot, configItem("gui.locked-home-item",
                         Material.BLACK_STAINED_GLASS_PANE, "&8Locked", List.of("&7Purchase more home slots!")));
-            }
-        }
-
-        if (teamSlots < 2) {
-            for (int i = teamSlots; i < 2; i++) {
-                inventory.setItem(i, blankPane());
             }
         }
 
@@ -120,9 +124,6 @@ public class HomeGUI {
         return item;
     }
 
-    private ItemStack blankPane() {
-        return namedItem(Material.BLACK_STAINED_GLASS_PANE, " ", List.of());
-    }
 
     private ItemStack namedItem(Material material, String name, List<String> lore) {
         ItemStack item = new ItemStack(material);
@@ -182,6 +183,36 @@ public class HomeGUI {
         } catch (NumberFormatException ignored) {
             return fallback;
         }
+    }
+
+    private List<Integer> resolveSlots(String path, int inventorySize) {
+        List<Integer> slots = new ArrayList<>();
+        for (int rawSlot : plugin.getConfig().getIntegerList(path)) {
+            if (rawSlot >= 0 && rawSlot < inventorySize && !slots.contains(rawSlot)) {
+                slots.add(rawSlot);
+            }
+        }
+        return slots;
+    }
+
+    private List<Integer> defaultSequentialSlots(int count, int inventorySize) {
+        List<Integer> slots = new ArrayList<>();
+        int max = Math.min(count, inventorySize);
+        for (int i = 0; i < max; i++) {
+            slots.add(i);
+        }
+        return slots;
+    }
+
+    private List<Integer> sequentialHomeSlots(int inventorySize, List<Integer> teamSlots) {
+        Set<Integer> blocked = new HashSet<>(teamSlots);
+        List<Integer> homeSlots = new ArrayList<>();
+        for (int i = 0; i < inventorySize; i++) {
+            if (!blocked.contains(i)) {
+                homeSlots.add(i);
+            }
+        }
+        return homeSlots;
     }
 
     private String asString(Object value) {
