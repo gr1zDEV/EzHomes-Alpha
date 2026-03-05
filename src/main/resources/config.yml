@@ -6,8 +6,13 @@ gui-title: "&6&lHomes"
 # Any color codes here use '&' formatting.
 gui:
   title: "&6&lHomes"
-  size: 54
+  size: 27
   team-slots: 2
+  team-slot-indexes: [10, 19]
+
+  # Slots that should display player homes. Any slot not listed here can be
+  # used for decorative/static items to build a fixed layout.
+  home-slots: [12, 13, 14, 15, 16, 21, 22, 23, 24, 25]
 
   team-item:
     material: RED_DYE
@@ -31,7 +36,7 @@ gui:
       - "&7Use /home create <name>"
 
   locked-home-item:
-    material: BLACK_STAINED_GLASS_PANE
+    material: TRIPWIRE_HOOK
     name: "&8Locked"
     lore:
       - "&7Purchase more home slots!"
@@ -39,12 +44,51 @@ gui:
   # Extra decorative or utility items you can place anywhere in the GUI.
   # Each item supports: slot, material, name, lore.
   static-items:
-    - slot: 53
-      material: BOOK
-      name: "&e&lInfo"
-      lore:
-        - "&7Edit this in config.yml"
-        - "&7to customize your homes GUI"
+    - slot: 0
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 1
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 2
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 3
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 4
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 5
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 6
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 7
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 8
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 9
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 11
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 17
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 18
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 20
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    - slot: 26
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
 
 default-home-limit: 1
 team-slots: 2
