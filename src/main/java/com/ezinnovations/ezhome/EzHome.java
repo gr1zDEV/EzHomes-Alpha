@@ -10,8 +10,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedPermissionData;
-import net.luckperms.api.context.QueryOptions;
 import net.luckperms.api.model.user.User;
+import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
@@ -100,8 +100,7 @@ public class EzHome extends JavaPlugin {
             return player.hasPermission(permission);
         }
 
-        QueryOptions queryOptions = luckPerms.getContextManager().getQueryOptions(player)
-            .orElseGet(luckPerms.getContextManager()::getStaticQueryOptions);
+        QueryOptions queryOptions = luckPerms.getContextManager().getQueryOptions(player);
 
         CachedPermissionData permissionData = user.getCachedData().getPermissionData(queryOptions);
         return permissionData.checkPermission(permission).asBoolean();
