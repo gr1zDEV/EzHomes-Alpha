@@ -7,6 +7,11 @@ import com.ezinnovations.ezhome.managers.HomeManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedPermissionData;
+import net.luckperms.api.context.QueryOptions;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
@@ -25,11 +30,13 @@ public class EzHome extends JavaPlugin {
     private HomeManager homeManager;
     private HomeGUI homeGUI;
     private boolean folia;
+    private LuckPerms luckPerms;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         folia = detectFolia();
+        luckPerms = detectLuckPerms();
 
         homeManager = new HomeManager(this);
         homeGUI = new HomeGUI(this);
@@ -76,11 +83,28 @@ public class EzHome extends JavaPlugin {
     public int getAllowedHomes(Player player) {
         int highest = getConfig().getInt("default-home-limit", 1);
         for (int i = 1; i <= 54; i++) {
-            if (player.hasPermission("ezhomes.homes." + i)) {
+            if (hasPermission(player, "ezhomes.homes." + i)) {
                 highest = Math.max(highest, i);
             }
         }
         return Math.max(1, highest);
+    }
+
+    public boolean hasPermission(Player player, String permission) {
+        if (luckPerms == null) {
+            return player.hasPermission(permission);
+        }
+
+        User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+        if (user == null) {
+            return player.hasPermission(permission);
+        }
+
+        QueryOptions queryOptions = luckPerms.getContextManager().getQueryOptions(player)
+            .orElseGet(luckPerms.getContextManager()::getStaticQueryOptions);
+
+        CachedPermissionData permissionData = user.getCachedData().getPermissionData(queryOptions);
+        return permissionData.checkPermission(permission).asBoolean();
     }
 
     public Component message(String key, String... placeholders) {
@@ -128,6 +152,14 @@ public class EzHome extends JavaPlugin {
             return true;
         } catch (ClassNotFoundException ignored) {
             return false;
+        }
+    }
+
+    private LuckPerms detectLuckPerms() {
+        try {
+            return LuckPermsProvider.get();
+        } catch (IllegalStateException ignored) {
+            return null;
         }
     }
 }

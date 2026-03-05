@@ -15,3 +15,168 @@ permissions:
   ezhome.use:
     description: Allows use of /home command
     default: true
+  ezhomes.homes.*:
+    description: Allows access to all home slots
+    default: op
+  ezhomes.homes.1:
+    description: Allows 1 home slot
+    default: true
+  ezhomes.homes.2:
+    description: Allows 2 home slots
+    default: false
+  ezhomes.homes.3:
+    description: Allows 3 home slots
+    default: false
+  ezhomes.homes.4:
+    description: Allows 4 home slots
+    default: false
+  ezhomes.homes.5:
+    description: Allows 5 home slots
+    default: false
+  ezhomes.homes.6:
+    description: Allows 6 home slots
+    default: false
+  ezhomes.homes.7:
+    description: Allows 7 home slots
+    default: false
+  ezhomes.homes.8:
+    description: Allows 8 home slots
+    default: false
+  ezhomes.homes.9:
+    description: Allows 9 home slots
+    default: false
+  ezhomes.homes.10:
+    description: Allows 10 home slots
+    default: false
+  ezhomes.homes.11:
+    description: Allows 11 home slots
+    default: false
+  ezhomes.homes.12:
+    description: Allows 12 home slots
+    default: false
+  ezhomes.homes.13:
+    description: Allows 13 home slots
+    default: false
+  ezhomes.homes.14:
+    description: Allows 14 home slots
+    default: false
+  ezhomes.homes.15:
+    description: Allows 15 home slots
+    default: false
+  ezhomes.homes.16:
+    description: Allows 16 home slots
+    default: false
+  ezhomes.homes.17:
+    description: Allows 17 home slots
+    default: false
+  ezhomes.homes.18:
+    description: Allows 18 home slots
+    default: false
+  ezhomes.homes.19:
+    description: Allows 19 home slots
+    default: false
+  ezhomes.homes.20:
+    description: Allows 20 home slots
+    default: false
+  ezhomes.homes.21:
+    description: Allows 21 home slots
+    default: false
+  ezhomes.homes.22:
+    description: Allows 22 home slots
+    default: false
+  ezhomes.homes.23:
+    description: Allows 23 home slots
+    default: false
+  ezhomes.homes.24:
+    description: Allows 24 home slots
+    default: false
+  ezhomes.homes.25:
+    description: Allows 25 home slots
+    default: false
+  ezhomes.homes.26:
+    description: Allows 26 home slots
+    default: false
+  ezhomes.homes.27:
+    description: Allows 27 home slots
+    default: false
+  ezhomes.homes.28:
+    description: Allows 28 home slots
+    default: false
+  ezhomes.homes.29:
+    description: Allows 29 home slots
+    default: false
+  ezhomes.homes.30:
+    description: Allows 30 home slots
+    default: false
+  ezhomes.homes.31:
+    description: Allows 31 home slots
+    default: false
+  ezhomes.homes.32:
+    description: Allows 32 home slots
+    default: false
+  ezhomes.homes.33:
+    description: Allows 33 home slots
+    default: false
+  ezhomes.homes.34:
+    description: Allows 34 home slots
+    default: false
+  ezhomes.homes.35:
+    description: Allows 35 home slots
+    default: false
+  ezhomes.homes.36:
+    description: Allows 36 home slots
+    default: false
+  ezhomes.homes.37:
+    description: Allows 37 home slots
+    default: false
+  ezhomes.homes.38:
+    description: Allows 38 home slots
+    default: false
+  ezhomes.homes.39:
+    description: Allows 39 home slots
+    default: false
+  ezhomes.homes.40:
+    description: Allows 40 home slots
+    default: false
+  ezhomes.homes.41:
+    description: Allows 41 home slots
+    default: false
+  ezhomes.homes.42:
+    description: Allows 42 home slots
+    default: false
+  ezhomes.homes.43:
+    description: Allows 43 home slots
+    default: false
+  ezhomes.homes.44:
+    description: Allows 44 home slots
+    default: false
+  ezhomes.homes.45:
+    description: Allows 45 home slots
+    default: false
+  ezhomes.homes.46:
+    description: Allows 46 home slots
+    default: false
+  ezhomes.homes.47:
+    description: Allows 47 home slots
+    default: false
+  ezhomes.homes.48:
+    description: Allows 48 home slots
+    default: false
+  ezhomes.homes.49:
+    description: Allows 49 home slots
+    default: false
+  ezhomes.homes.50:
+    description: Allows 50 home slots
+    default: false
+  ezhomes.homes.51:
+    description: Allows 51 home slots
+    default: false
+  ezhomes.homes.52:
+    description: Allows 52 home slots
+    default: false
+  ezhomes.homes.53:
+    description: Allows 53 home slots
+    default: false
+  ezhomes.homes.54:
+    description: Allows 54 home slots
+    default: false
