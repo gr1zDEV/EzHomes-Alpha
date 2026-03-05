@@ -24,15 +24,20 @@ import java.util.Set;
 public class HomeGUI {
     public static final int SIZE = 54;
     private static final String HOME_KEY = "home-name";
+    private static final String ACTION_KEY = "gui-action";
+    private static final String ACTION_TELEPORT = "teleport";
+    private static final String ACTION_DELETE = "delete";
 
     private final EzHome plugin;
     private final LegacyComponentSerializer legacySerializer;
     private final NamespacedKey homeNameKey;
+    private final NamespacedKey actionKey;
 
     public HomeGUI(EzHome plugin) {
         this.plugin = plugin;
         this.legacySerializer = LegacyComponentSerializer.legacyAmpersand();
         this.homeNameKey = new NamespacedKey(plugin, HOME_KEY);
+        this.actionKey = new NamespacedKey(plugin, ACTION_KEY);
     }
 
     public void open(Player player) {
@@ -48,9 +53,20 @@ public class HomeGUI {
         }
 
         List<Integer> homeSlotIndexes = resolveSlots("gui.home-slots", inventory.getSize());
+        List<Integer> homeActionSlotIndexes = resolveSlots("gui.home-action-slots", inventory.getSize());
         if (homeSlotIndexes.isEmpty()) {
             homeSlotIndexes = sequentialHomeSlots(inventory.getSize(), teamSlotIndexes);
         }
+        if (homeActionSlotIndexes.isEmpty()) {
+            homeActionSlotIndexes = homeSlotIndexes.stream()
+                    .map(slot -> slot + 9)
+                    .filter(slot -> slot < inventory.getSize())
+                    .toList();
+        }
+
+        int pairedSlots = Math.min(homeSlotIndexes.size(), homeActionSlotIndexes.size());
+        homeSlotIndexes = new ArrayList<>(homeSlotIndexes.subList(0, pairedSlots));
+        homeActionSlotIndexes = new ArrayList<>(homeActionSlotIndexes.subList(0, pairedSlots));
 
         for (Map<?, ?> itemConfig : plugin.getConfig().getMapList("gui.static-items")) {
             int slot = toInt(itemConfig.get("slot"), -1);
@@ -71,16 +87,22 @@ public class HomeGUI {
         homes.sort(Comparator.comparing(Home::name, String.CASE_INSENSITIVE_ORDER));
 
         for (int index = 0; index < homeSlotIndexes.size(); index++) {
-            int slot = homeSlotIndexes.get(index);
+            int bedSlot = homeSlotIndexes.get(index);
+            int dyeSlot = homeActionSlotIndexes.get(index);
             if (index < homes.size()) {
                 Home home = homes.get(index);
-                inventory.setItem(slot, homeItem(home));
+                inventory.setItem(bedSlot, homeItem(home));
+                inventory.setItem(dyeSlot, homeDeleteItem(home));
             } else if (index < allowedHomes) {
-                inventory.setItem(slot, configItem("gui.empty-home-item",
-                        Material.GRAY_STAINED_GLASS_PANE, "&7Empty Home Slot", List.of("&7Use /home create <name>")));
+                inventory.setItem(bedSlot, configItem("gui.empty-home-item",
+                        Material.GRAY_BED, "&7Empty Home Slot", List.of("&7Use /home create <name>")));
+                inventory.setItem(dyeSlot, configItem("gui.empty-home-action-item",
+                        Material.GRAY_DYE, "&7Unused Slot", List.of("&7Create a home to enable this action")));
             } else {
-                inventory.setItem(slot, configItem("gui.locked-home-item",
-                        Material.BLACK_STAINED_GLASS_PANE, "&8Locked", List.of("&7Purchase more home slots!")));
+                inventory.setItem(bedSlot, configItem("gui.locked-home-item",
+                        Material.RED_BED, "&cLocked", List.of("&7Purchase more home slots!")));
+                inventory.setItem(dyeSlot, configItem("gui.locked-home-action-item",
+                        Material.RED_DYE, "&cLocked", List.of("&7Unlock more home slots first")));
             }
         }
 
@@ -103,23 +125,70 @@ public class HomeGUI {
         return PlainTextComponentSerializer.plainText().serialize(displayName);
     }
 
+    public String resolveAction(ItemStack stack) {
+        if (stack == null || !stack.hasItemMeta()) {
+            return null;
+        }
+        return stack.getItemMeta().getPersistentDataContainer().get(actionKey, PersistentDataType.STRING);
+    }
+
+    public void openDeleteConfirmation(Player player, String homeName) {
+        String title = plugin.getConfig().getString("gui.delete-confirmation.title", "&cDelete Home?");
+        Inventory confirmInventory = Bukkit.createInventory(player, 27, parseLegacy(title));
+
+        for (int i = 0; i < confirmInventory.getSize(); i++) {
+            confirmInventory.setItem(i, configItem("gui.delete-confirmation.filler-item",
+                    Material.GRAY_STAINED_GLASS_PANE, " ", List.of()));
+        }
+
+        confirmInventory.setItem(11, actionItem(configItem("gui.delete-confirmation.confirm-item",
+                        Material.RED_DYE, "&cDelete {name}", List.of("&7Click to permanently delete this home."),
+                        "name", homeName),
+                homeName,
+                ACTION_DELETE));
+
+        confirmInventory.setItem(15, configItem("gui.delete-confirmation.cancel-item",
+                Material.LIME_DYE, "&aCancel", List.of("&7Go back to your homes.")));
+
+        player.openInventory(confirmInventory);
+    }
+
+    public boolean isDeleteConfirmationTitle(String plainTitle) {
+        String configured = plugin.getConfig().getString("gui.delete-confirmation.title", "&cDelete Home?");
+        String expected = PlainTextComponentSerializer.plainText().serialize(parseLegacy(configured));
+        return expected.equals(plainTitle);
+    }
+
     private ItemStack homeItem(Home home) {
-        ItemStack item = configItem("gui.home-item", Material.LIGHT_BLUE_BED,
+        return actionItem(configItem("gui.home-item", Material.GREEN_BED,
                 "&b&l{name}",
                 List.of(
                         "&7World: &f{world}",
                         "&7X: &f{x} &7Y: &f{y} &7Z: &f{z}",
-                        "&eClick to teleport",
-                        "&cShift+Click to delete"
+                        "&eClick to teleport"
                 ),
                 "name", home.name(),
                 "world", home.world(),
                 "x", format(home.x()),
                 "y", format(home.y()),
-                "z", format(home.z()));
+                "z", format(home.z())),
+                home.name(),
+                ACTION_TELEPORT);
+    }
 
+    private ItemStack homeDeleteItem(Home home) {
+        return actionItem(configItem("gui.home-action-item", Material.GREEN_DYE,
+                        "&aDelete {name}",
+                        List.of("&7Click to open delete confirmation."),
+                        "name", home.name()),
+                home.name(),
+                ACTION_DELETE);
+    }
+
+    private ItemStack actionItem(ItemStack item, String homeName, String action) {
         ItemMeta meta = item.getItemMeta();
-        meta.getPersistentDataContainer().set(homeNameKey, PersistentDataType.STRING, home.name());
+        meta.getPersistentDataContainer().set(homeNameKey, PersistentDataType.STRING, homeName);
+        meta.getPersistentDataContainer().set(actionKey, PersistentDataType.STRING, action);
         item.setItemMeta(meta);
         return item;
     }
