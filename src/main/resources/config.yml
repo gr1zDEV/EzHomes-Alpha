@@ -10,9 +10,11 @@ gui:
   team-slots: 2
   team-slot-indexes: [10, 19]
 
-  # Slots that should display player homes. Any slot not listed here can be
-  # used for decorative/static items to build a fixed layout.
-  home-slots: [12, 13, 14, 15, 16, 21, 22, 23, 24, 25]
+  # Bed row (homes): Slot 11, 13, 14, 15, 16, 17
+  home-slots: [11, 13, 14, 15, 16, 17]
+
+  # Dye row directly underneath each bed.
+  home-action-slots: [20, 22, 23, 24, 25, 26]
 
   team-item:
     material: RED_DYE
@@ -21,25 +23,58 @@ gui:
       - "&7Coming Soon..."
 
   home-item:
-    material: LIGHT_BLUE_BED
-    name: "&b&l{name}"
+    material: GREEN_BED
+    name: "&a&l{name}"
     lore:
       - "&7World: &f{world}"
       - "&7X: &f{x} &7Y: &f{y} &7Z: &f{z}"
       - "&eClick to teleport"
-      - "&cShift+Click to delete"
+
+  home-action-item:
+    material: GREEN_DYE
+    name: "&aDelete {name}"
+    lore:
+      - "&7Click to open delete confirmation."
 
   empty-home-item:
-    material: GRAY_STAINED_GLASS_PANE
-    name: "&7Empty Home Slot"
+    material: GRAY_BED
+    name: "&7Unused Home Slot"
     lore:
       - "&7Use /home create <name>"
 
+  empty-home-action-item:
+    material: GRAY_DYE
+    name: "&7Unused Action"
+    lore:
+      - "&7Create a home to enable this action"
+
   locked-home-item:
-    material: TRIPWIRE_HOOK
-    name: "&8Locked"
+    material: RED_BED
+    name: "&cLocked Slot"
     lore:
       - "&7Purchase more home slots!"
+
+  locked-home-action-item:
+    material: RED_DYE
+    name: "&cLocked Action"
+    lore:
+      - "&7Unlock more home slots first"
+
+  delete-confirmation:
+    title: "&cDelete Home?"
+    filler-item:
+      material: GRAY_STAINED_GLASS_PANE
+      name: " "
+    confirm-item:
+      material: RED_DYE
+      name: "&cConfirm Delete: {name}"
+      lore:
+        - "&7This cannot be undone."
+    cancel-item:
+      material: LIME_DYE
+      name: "&aCancel"
+      lore:
+        - "&7Return to your homes menu."
 
   # Extra decorative or utility items you can place anywhere in the GUI.
   # Each item supports: slot, material, name, lore.
@@ -74,19 +109,13 @@ gui:
     - slot: 9
       material: GRAY_STAINED_GLASS_PANE
       name: " "
-    - slot: 11
-      material: GRAY_STAINED_GLASS_PANE
-      name: " "
-    - slot: 17
+    - slot: 12
       material: GRAY_STAINED_GLASS_PANE
       name: " "
     - slot: 18
       material: GRAY_STAINED_GLASS_PANE
       name: " "
-    - slot: 20
-      material: GRAY_STAINED_GLASS_PANE
-      name: " "
-    - slot: 26
+    - slot: 21
       material: GRAY_STAINED_GLASS_PANE
       name: " "
 

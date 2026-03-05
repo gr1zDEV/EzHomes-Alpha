@@ -2,6 +2,7 @@ package com.ezinnovations.ezhome.listeners;
 
 import com.ezinnovations.ezhome.EzHome;
 import com.ezinnovations.ezhome.models.Home;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,12 +25,15 @@ public class GUIListener implements Listener {
             return;
         }
 
-        String rawTitle = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
-                .serialize(event.getView().title());
+        String rawTitle = PlainTextComponentSerializer.plainText().serialize(event.getView().title());
+        if (plugin.getHomeGUI().isDeleteConfirmationTitle(rawTitle)) {
+            handleDeleteConfirmationClick(event, player);
+            return;
+        }
+
         String configuredTitle = plugin.getConfig().getString("gui.title",
                 plugin.getConfig().getString("gui-title", "&6&lHomes"));
-        String expectedTitle = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
-                .serialize(plugin.parse(configuredTitle));
+        String expectedTitle = PlainTextComponentSerializer.plainText().serialize(plugin.parse(configuredTitle));
         if (!rawTitle.equals(expectedTitle)) {
             return;
         }
@@ -40,17 +44,18 @@ public class GUIListener implements Listener {
             return;
         }
 
-
         String homeName = plugin.getHomeGUI().resolveHomeName(item);
         if (homeName == null || homeName.isBlank()) {
             return;
         }
 
-        if (event.isShiftClick() && event.isLeftClick()) {
-            if (plugin.getHomeManager().deleteHome(player.getUniqueId(), homeName)) {
-                player.sendMessage(plugin.message("home-deleted", "name", homeName));
-                plugin.scheduleRegionTask(player.getLocation(), () -> plugin.getHomeGUI().open(player));
-            }
+        String action = plugin.getHomeGUI().resolveAction(item);
+        if ("delete".equals(action)) {
+            plugin.getHomeGUI().openDeleteConfirmation(player, homeName);
+            return;
+        }
+
+        if (!"teleport".equals(action)) {
             return;
         }
 
@@ -69,5 +74,26 @@ public class GUIListener implements Listener {
         Location target = new Location(world, home.x(), home.y(), home.z(), home.yaw(), home.pitch());
         player.sendMessage(plugin.message("teleporting", "name", home.name()));
         plugin.scheduleEntityTask(player, () -> player.teleportAsync(target).thenRun(player::closeInventory));
+    }
+
+    private void handleDeleteConfirmationClick(InventoryClickEvent event, Player player) {
+        event.setCancelled(true);
+
+        ItemStack item = event.getCurrentItem();
+        if (item == null) {
+            return;
+        }
+
+        String action = plugin.getHomeGUI().resolveAction(item);
+        if ("delete".equals(action)) {
+            String homeName = plugin.getHomeGUI().resolveHomeName(item);
+            if (homeName != null && plugin.getHomeManager().deleteHome(player.getUniqueId(), homeName)) {
+                player.sendMessage(plugin.message("home-deleted", "name", homeName));
+            }
+            plugin.scheduleRegionTask(player.getLocation(), () -> plugin.getHomeGUI().open(player));
+            return;
+        }
+
+        plugin.scheduleRegionTask(player.getLocation(), () -> plugin.getHomeGUI().open(player));
     }
 }
