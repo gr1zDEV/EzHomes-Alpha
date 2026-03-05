@@ -28,6 +28,11 @@ public class HomeCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (!plugin.hasPermission(player, "ezhome.use")) {
+            player.sendMessage(plugin.parse("&cYou do not have permission to use this command."));
+            return true;
+        }
+
         if (args.length == 0) {
             plugin.getHomeGUI().open(player);
             return true;
