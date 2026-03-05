@@ -4,7 +4,6 @@ import com.ezinnovations.ezhome.EzHome;
 import com.ezinnovations.ezhome.models.Home;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,8 +26,10 @@ public class GUIListener implements Listener {
 
         String rawTitle = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
                 .serialize(event.getView().title());
+        String configuredTitle = plugin.getConfig().getString("gui.title",
+                plugin.getConfig().getString("gui-title", "&6&lHomes"));
         String expectedTitle = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
-                .serialize(plugin.parse(plugin.getConfig().getString("gui-title", "&6&lHomes")));
+                .serialize(plugin.parse(configuredTitle));
         if (!rawTitle.equals(expectedTitle)) {
             return;
         }
@@ -39,9 +40,6 @@ public class GUIListener implements Listener {
             return;
         }
 
-        if (item.getType() != Material.LIGHT_BLUE_BED) {
-            return;
-        }
 
         String homeName = plugin.getHomeGUI().resolveHomeName(item);
         if (homeName == null || homeName.isBlank()) {

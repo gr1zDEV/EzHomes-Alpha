@@ -1,5 +1,51 @@
 # EzHome Configuration
+# Legacy key is kept for compatibility with older versions.
 gui-title: "&6&lHomes"
+
+# New GUI config section
+# Any color codes here use '&' formatting.
+gui:
+  title: "&6&lHomes"
+  size: 54
+  team-slots: 2
+
+  team-item:
+    material: RED_DYE
+    name: "&c&lTeams"
+    lore:
+      - "&7Coming Soon..."
+
+  home-item:
+    material: LIGHT_BLUE_BED
+    name: "&b&l{name}"
+    lore:
+      - "&7World: &f{world}"
+      - "&7X: &f{x} &7Y: &f{y} &7Z: &f{z}"
+      - "&eClick to teleport"
+      - "&cShift+Click to delete"
+
+  empty-home-item:
+    material: GRAY_STAINED_GLASS_PANE
+    name: "&7Empty Home Slot"
+    lore:
+      - "&7Use /home create <name>"
+
+  locked-home-item:
+    material: BLACK_STAINED_GLASS_PANE
+    name: "&8Locked"
+    lore:
+      - "&7Purchase more home slots!"
+
+  # Extra decorative or utility items you can place anywhere in the GUI.
+  # Each item supports: slot, material, name, lore.
+  static-items:
+    - slot: 53
+      material: BOOK
+      name: "&e&lInfo"
+      lore:
+        - "&7Edit this in config.yml"
+        - "&7to customize your homes GUI"
+
 default-home-limit: 1
 team-slots: 2
 messages:
